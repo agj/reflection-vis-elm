@@ -52,7 +52,7 @@ construct { mirrorAngle, sightAngle } =
 
         sightLine : List (LineSegment2d Pixels c)
         sightLine =
-            getActualSightLine eye sightDirection mirrorLeftAxis mirrorRightAxis
+            getActualSightLine eye sightDirection mirrorLeftAxis mirrorRightAxis box
 
         projectedSightLine : Maybe (LineSegment2d Pixels c)
         projectedSightLine =
@@ -135,8 +135,8 @@ view scene =
 -- INTERNAL
 
 
-getActualSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Axis2d Pixels c -> List (LineSegment2d Pixels c)
-getActualSightLine eye direction mirrorLeftAxis mirrorRightAxis =
+getActualSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Axis2d Pixels c -> Rectangle2d Pixels c -> List (LineSegment2d Pixels c)
+getActualSightLine eye direction mirrorLeftAxis mirrorRightAxis box =
     let
         sightLine : LineSegment2d Pixels c
         sightLine =
@@ -147,8 +147,22 @@ getActualSightLine eye direction mirrorLeftAxis mirrorRightAxis =
         bouncedLine : List (LineSegment2d Pixels c)
         bouncedLine =
             bounceLineBetween 10 sightLine mirrorLeftAxis mirrorRightAxis
+
+        intersectedBouncedLine : List (LineSegment2d Pixels c)
+        intersectedBouncedLine =
+            bouncedLine
+                |> List.foldr
+                    (\line accumulated ->
+                        case intersectLineWithBox box line of
+                            Just intersectedLine ->
+                                [ intersectedLine ]
+
+                            Nothing ->
+                                line :: accumulated
+                    )
+                    []
     in
-    bouncedLine
+    intersectedBouncedLine
 
 
 getProjectedSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Axis2d Pixels c -> Rectangle2d Pixels c -> Maybe (LineSegment2d Pixels c)
