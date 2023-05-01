@@ -188,7 +188,7 @@ bounceLineBetween maxBounces line bounceAxisA bounceAxisB =
                         bounceLineBetween (maxBounces - 1) lineAfterBounce bounceAxisA bounceAxisB
 
                     else
-                        [ lineAfterBounce ]
+                        []
             in
             lineBeforeBounce :: restBouncedLines
 
