@@ -181,7 +181,11 @@ bounceLine line bounceAxis =
         Just point ->
             let
                 exitAngle =
-                    Angle.degrees 270
+                    line
+                        |> LineSegment2d.mirrorAcross bounceAxis
+                        |> LineSegment2d.direction
+                        |> Maybe.map Direction2d.toAngle
+                        |> Maybe.withDefault (Angle.degrees 0)
             in
             [ LineSegment2d.from
                 (LineSegment2d.startPoint line)
