@@ -142,7 +142,7 @@ getActualSightLine eye direction mirrorLeftAxis mirrorRightAxis =
                 eye
                 (Vector2d.withLength (Pixels.float 1000) direction)
     in
-    bounceLine sightLine mirrorRightAxis
+    bounceLineBetween 10 sightLine mirrorLeftAxis mirrorRightAxis
 
 
 getProjectedSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Axis2d Pixels c -> Maybe (LineSegment2d Pixels c)
@@ -168,7 +168,39 @@ getProjectedSightLine eye direction mirrorLeftAxis mirrorRightAxis =
             )
 
 
-bounceLine : LineSegment2d Pixels c -> Axis2d Pixels c -> List (LineSegment2d Pixels c)
+bounceLineBetween : Int -> LineSegment2d Pixels c -> Axis2d Pixels c -> Axis2d Pixels c -> List (LineSegment2d Pixels c)
+bounceLineBetween maxBounces line bounceAxisA bounceAxisB =
+    let
+        log =
+            Debug.log "maxBounces" maxBounces
+
+        bounced =
+            case bounceLine line bounceAxisA of
+                Nothing ->
+                    bounceLine line bounceAxisB
+
+                more ->
+                    more
+    in
+    case bounced of
+        Just ( lineBeforeBounce, lineAfterBounce ) ->
+            let
+                restBouncedLines =
+                    if maxBounces > 1 then
+                        bounceLineBetween (maxBounces - 1) lineAfterBounce bounceAxisA bounceAxisB
+
+                    else
+                        [ lineAfterBounce ]
+            in
+            lineBeforeBounce
+                :: restBouncedLines
+                |> Debug.log "result"
+
+        Nothing ->
+            [ line ]
+
+
+bounceLine : LineSegment2d Pixels c -> Axis2d Pixels c -> Maybe ( LineSegment2d Pixels c, LineSegment2d Pixels c )
 bounceLine line bounceAxis =
     let
         intersection : Maybe (Point2d Pixels c)
@@ -178,24 +210,30 @@ bounceLine line bounceAxis =
     in
     case intersection of
         Just point ->
-            let
-                exitAngle =
-                    line
-                        |> LineSegment2d.mirrorAcross bounceAxis
-                        |> LineSegment2d.direction
-                        |> Maybe.map Direction2d.toAngle
-                        |> Maybe.withDefault (Angle.degrees 0)
-            in
-            [ LineSegment2d.from
-                (LineSegment2d.startPoint line)
-                point
-            , LineSegment2d.fromPointAndVector
-                point
-                (Vector2d.rTheta (Pixels.float 1000) exitAngle)
-            ]
+            if LineSegment2d.startPoint line == point then
+                Nothing
+
+            else
+                let
+                    exitAngle =
+                        line
+                            |> LineSegment2d.mirrorAcross bounceAxis
+                            |> LineSegment2d.direction
+                            |> Maybe.map Direction2d.toAngle
+                            |> Maybe.withDefault (Angle.degrees 0)
+                            |> Debug.log "exitAngle"
+                in
+                Just
+                    ( LineSegment2d.from
+                        (LineSegment2d.startPoint line)
+                        point
+                    , LineSegment2d.fromPointAndVector
+                        point
+                        (Vector2d.rTheta (Pixels.float 1000) exitAngle)
+                    )
 
         Nothing ->
-            [ line ]
+            Nothing
 
 
 viewMirror : LineSegment2d u c -> Html msg
