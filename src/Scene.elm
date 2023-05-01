@@ -1,4 +1,7 @@
-module Scene exposing (..)
+module Scene exposing
+    ( construct
+    , view
+    )
 
 import Angle
 import Axis2d exposing (Axis2d)
@@ -22,7 +25,7 @@ import Vector2d
 type alias Scene =
     { eye : Point2d Pixels Never
     , actualSightLine : List (LineSegment2d Pixels Never)
-    , projectedSightLine : List (LineSegment2d Pixels Never)
+    , projectedSightLine : Maybe (LineSegment2d Pixels Never)
     , mirror : LineSegment2d Pixels Never
     , box : Rectangle2d Pixels Never
     , reflectedBox : Rectangle2d Pixels Never
@@ -47,6 +50,10 @@ construct { mirrorAngle, sightAngle } =
         sightLine : List (LineSegment2d Pixels c)
         sightLine =
             getActualSightLine eye sightDirection mirrorAxis
+
+        projectedSightLine : Maybe (LineSegment2d Pixels c)
+        projectedSightLine =
+            getProjectedSightLine eye sightDirection mirrorAxis
 
         mirrorAxis : Axis2d Pixels c
         mirrorAxis =
@@ -79,7 +86,7 @@ construct { mirrorAngle, sightAngle } =
     in
     { eye = eye
     , actualSightLine = sightLine
-    , projectedSightLine = []
+    , projectedSightLine = projectedSightLine
     , mirror = mirror
     , box = box
     , reflectedBox = reflectedBox
@@ -88,11 +95,21 @@ construct { mirrorAngle, sightAngle } =
 
 view : Scene -> List (Html msg)
 view scene =
+    let
+        projectedSightLine =
+            case scene.projectedSightLine of
+                Just line ->
+                    [ viewSightLine False line ]
+
+                Nothing ->
+                    []
+    in
     [ viewMirror scene.mirror
     , viewBox scene.box
     , viewBox scene.reflectedBox
     ]
-        ++ viewSight scene.actualSightLine
+        ++ projectedSightLine
+        ++ (scene.actualSightLine |> List.map (viewSightLine True))
         ++ [ viewEye scene.eye ]
 
 
@@ -110,6 +127,29 @@ getActualSightLine eye direction mirrorAxis =
                 (Vector2d.withLength (Pixels.float 1000) direction)
     in
     bounceLine sightLine mirrorAxis
+
+
+getProjectedSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Maybe (LineSegment2d Pixels c)
+getProjectedSightLine eye direction mirrorAxis =
+    let
+        sightLine : LineSegment2d Pixels c
+        sightLine =
+            LineSegment2d.fromPointAndVector
+                eye
+                (Vector2d.withLength (Pixels.float 1000) direction)
+
+        intersection : Maybe (Point2d Pixels c)
+        intersection =
+            sightLine
+                |> LineSegment2d.intersectionWithAxis mirrorAxis
+    in
+    intersection
+        |> Maybe.map
+            (\line ->
+                LineSegment2d.from
+                    line
+                    (LineSegment2d.endPoint sightLine)
+            )
 
 
 bounceLine : LineSegment2d Pixels c -> Axis2d Pixels c -> List (LineSegment2d Pixels c)
@@ -168,13 +208,11 @@ viewEye point =
             ]
 
 
-viewSight : List (LineSegment2d Pixels c) -> List (Html msg)
-viewSight lines =
-    lines
-        |> List.map
-            (Svg.lineSegment2d
-                [ SvgAttr.strokeWidth (px 3)
-                , SvgAttr.strokeLinecap StrokeLinecapRound
-                , SvgAttr.stroke (Paint Color.lightBrown)
-                ]
-            )
+viewSightLine : Bool -> LineSegment2d Pixels c -> Html msg
+viewSightLine isActual =
+    Svg.lineSegment2d
+        [ SvgAttr.strokeWidth (px 3)
+        , SvgAttr.strokeLinecap StrokeLinecapRound
+        , SvgAttr.stroke (Paint Color.lightBrown)
+        , SvgAttr.strokeDasharray "4 8"
+        ]
