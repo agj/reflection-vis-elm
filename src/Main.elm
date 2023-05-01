@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Angle
-import Axis2d
+import Axis2d exposing (Axis2d)
 import Browser
 import Color
 import Direction2d
@@ -99,13 +99,19 @@ view model =
 viewScene : Controls -> List (Html Msg)
 viewScene controls =
     let
+        mirrorAxis : Axis2d Pixels c
+        mirrorAxis =
+            Axis2d.through
+                Point2d.origin
+                Direction2d.positiveY
+                |> Axis2d.rotateBy (Angle.degrees controls.mirrorAngle)
+
         mirror : LineSegment2d Pixels c
         mirror =
-            LineSegment2d.from
-                (Point2d.pixels 0 -200)
-                (Point2d.pixels 0 200)
-                |> LineSegment2d.rotateAround Point2d.origin
-                    (Angle.degrees controls.mirrorAngle)
+            LineSegment2d.along
+                mirrorAxis
+                (Pixels.float -200)
+                (Pixels.float 200)
 
         box : Rectangle2d Pixels c
         box =
