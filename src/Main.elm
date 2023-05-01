@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Angle
+import Axis2d
 import Browser
 import Color
 import Direction2d
@@ -70,11 +71,20 @@ view model =
                 ( Pixels.float 50, Pixels.float 50 )
                 (Angle.degrees 20)
                 (Point2d.pixels -100 0)
+
+        reflectedBox : Rectangle2d Pixels c
+        reflectedBox =
+            box
+                |> Rectangle2d.mirrorAcross
+                    (Axis2d.throughPoints (LineSegment2d.startPoint mirror) (LineSegment2d.endPoint mirror)
+                        |> Maybe.withDefault Axis2d.x
+                    )
     in
     Html.div [ Html.Attributes.class "container" ]
         [ Svg.svg [ SvgAttr.viewBox -500 -500 1000 1000 ]
             [ mirror |> viewMirror
             , box |> viewBox
+            , reflectedBox |> viewBox
             ]
         , Html.node "style"
             []
