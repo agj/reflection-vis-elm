@@ -15,7 +15,7 @@ import Point2d
 import Rectangle2d exposing (Rectangle2d)
 import TypedSvg as Svg
 import TypedSvg.Attributes as SvgAttr
-import TypedSvg.Types exposing (Paint(..), Transform(..), pc, px)
+import TypedSvg.Types exposing (Paint(..), StrokeLinecap(..), Transform(..), pc, px)
 import Vector2d
 
 
@@ -82,8 +82,8 @@ view model =
         mirror : LineSegment2d Pixels c
         mirror =
             LineSegment2d.from
-                (Point2d.pixels 0 -100)
-                (Point2d.pixels 0 100)
+                (Point2d.pixels 0 -200)
+                (Point2d.pixels 0 200)
                 |> LineSegment2d.rotateAround Point2d.origin
                     (Angle.degrees controls.mirrorAngle)
 
@@ -132,6 +132,7 @@ viewMirror segment =
         |> Svg.lineSegment2d
             [ SvgAttr.stroke (Paint Color.lightPurple)
             , SvgAttr.strokeWidth (px 3)
+            , SvgAttr.strokeLinecap StrokeLinecapRound
             ]
 
 
