@@ -32,6 +32,7 @@ type alias Scene =
     , projectedSightLine : Maybe (LineSegment2d Pixels Never)
     , mirrorRight : LineSegment2d Pixels Never
     , mirrorLeft : LineSegment2d Pixels Never
+    , reflectedMirrors : List (LineSegment2d Pixels Never)
     , box : Rectangle2d Pixels Never
     , reflectedBox : Rectangle2d Pixels Never
     }
@@ -65,9 +66,7 @@ construct { mirrorAngle, sightAngle, depth } =
 
         mirrorRightAxis : Axis2d Pixels c
         mirrorRightAxis =
-            Axis2d.through
-                Point2d.origin
-                Direction2d.positiveY
+            Axis2d.through Point2d.origin Direction2d.positiveY
                 |> Axis2d.rotateBy (Angle.degrees mirrorAngle)
 
         mirrorRight : LineSegment2d Pixels c
@@ -104,12 +103,18 @@ construct { mirrorAngle, sightAngle, depth } =
                     (Axis2d.throughPoints (LineSegment2d.startPoint mirrorRight) (LineSegment2d.endPoint mirrorRight)
                         |> Maybe.withDefault Axis2d.x
                     )
+
+        reflectedMirror : LineSegment2d Pixels c
+        reflectedMirror =
+            mirrorLeft
+                |> LineSegment2d.mirrorAcross mirrorRightAxis
     in
     { eye = eye
     , actualSightLine = sightLine
     , projectedSightLine = projectedSightLine
     , mirrorRight = mirrorRight
     , mirrorLeft = mirrorLeft
+    , reflectedMirrors = [ reflectedMirror ]
     , box = box
     , reflectedBox = reflectedBox
     }
@@ -128,9 +133,11 @@ view scene =
     in
     [ viewMirror scene.mirrorRight
     , viewMirror scene.mirrorLeft
-    , viewBox scene.box
-    , viewBox scene.reflectedBox
     ]
+        ++ (scene.reflectedMirrors |> List.map viewMirror)
+        ++ [ viewBox scene.box
+           , viewBox scene.reflectedBox
+           ]
         ++ projectedSightLine
         ++ (scene.actualSightLine |> List.map (viewSightLine True))
         ++ [ viewEye scene.eye ]
