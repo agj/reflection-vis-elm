@@ -13,6 +13,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Knob exposing (Knob)
 import LineSegment2d exposing (LineSegment2d)
+import Maybe.Extra as Maybe
 import Pixels exposing (Pixels)
 import Point2d exposing (Point2d)
 import Rectangle2d exposing (Rectangle2d)
@@ -202,18 +203,11 @@ bounceLineBetween maxBounces line bounceAxisA bounceAxisB =
 
 bounceLine : LineSegment2d Pixels c -> Axis2d Pixels c -> Maybe ( LineSegment2d Pixels c, LineSegment2d Pixels c )
 bounceLine line bounceAxis =
-    let
-        intersection : Maybe (Point2d Pixels c)
-        intersection =
-            line
-                |> LineSegment2d.intersectionWithAxis bounceAxis
-    in
-    case intersection of
-        Just point ->
-            if LineSegment2d.startPoint line == point then
-                Nothing
-
-            else
+    line
+        |> LineSegment2d.intersectionWithAxis bounceAxis
+        |> Maybe.filter ((/=) (LineSegment2d.startPoint line))
+        |> Maybe.map
+            (\intersectionPoint ->
                 let
                     exitAngle =
                         line
@@ -223,17 +217,14 @@ bounceLine line bounceAxis =
                             |> Maybe.withDefault (Angle.degrees 0)
                             |> Debug.log "exitAngle"
                 in
-                Just
-                    ( LineSegment2d.from
-                        (LineSegment2d.startPoint line)
-                        point
-                    , LineSegment2d.fromPointAndVector
-                        point
-                        (Vector2d.rTheta (Pixels.float 1000) exitAngle)
-                    )
-
-        Nothing ->
-            Nothing
+                ( LineSegment2d.from
+                    (LineSegment2d.startPoint line)
+                    intersectionPoint
+                , LineSegment2d.fromPointAndVector
+                    intersectionPoint
+                    (Vector2d.rTheta (Pixels.float 1000) exitAngle)
+                )
+            )
 
 
 viewMirror : LineSegment2d u c -> Html msg
