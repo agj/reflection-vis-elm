@@ -75,10 +75,30 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    let
-        controls =
-            Knob.value model.controls
+    Html.div [ Html.Attributes.class "container" ]
+        [ Svg.svg [ SvgAttr.viewBox -500 -500 1000 1000 ]
+            (viewScene (Knob.value model.controls))
+        , Html.node "style"
+            []
+            [ Html.text
+                """
+                html,
+                body,
+                .container,
+                svg {
+                    height: 100%;
+                    width: 100%;
+                }  
+                """
+            ]
+        , Knob.view ControlsKnobUpdated model.controls
+        , Knob.styles
+        ]
 
+
+viewScene : Controls -> List (Html Msg)
+viewScene controls =
+    let
         mirror : LineSegment2d Pixels c
         mirror =
             LineSegment2d.from
@@ -102,28 +122,10 @@ view model =
                         |> Maybe.withDefault Axis2d.x
                     )
     in
-    Html.div [ Html.Attributes.class "container" ]
-        [ Svg.svg [ SvgAttr.viewBox -500 -500 1000 1000 ]
-            [ mirror |> viewMirror
-            , box |> viewBox
-            , reflectedBox |> viewBox
-            ]
-        , Html.node "style"
-            []
-            [ Html.text
-                """
-                html,
-                body,
-                .container,
-                svg {
-                    height: 100%;
-                    width: 100%;
-                }  
-                """
-            ]
-        , Knob.view ControlsKnobUpdated model.controls
-        , Knob.styles
-        ]
+    [ mirror |> viewMirror
+    , box |> viewBox
+    , reflectedBox |> viewBox
+    ]
 
 
 viewMirror : LineSegment2d u c -> Html Msg
