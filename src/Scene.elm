@@ -172,9 +172,6 @@ getProjectedSightLine eye direction mirrorLeftAxis mirrorRightAxis =
 bounceLineBetween : Int -> LineSegment2d Pixels c -> Axis2d Pixels c -> Axis2d Pixels c -> List (LineSegment2d Pixels c)
 bounceLineBetween maxBounces line bounceAxisA bounceAxisB =
     let
-        log =
-            Debug.log "maxBounces" maxBounces
-
         bounced =
             case bounceLine line bounceAxisA of
                 Nothing ->
@@ -193,9 +190,7 @@ bounceLineBetween maxBounces line bounceAxisA bounceAxisB =
                     else
                         [ lineAfterBounce ]
             in
-            lineBeforeBounce
-                :: restBouncedLines
-                |> Debug.log "result"
+            lineBeforeBounce :: restBouncedLines
 
         Nothing ->
             [ line ]
@@ -215,7 +210,6 @@ bounceLine line bounceAxis =
                             |> LineSegment2d.direction
                             |> Maybe.map Direction2d.toAngle
                             |> Maybe.withDefault (Angle.degrees 0)
-                            |> Debug.log "exitAngle"
                 in
                 ( LineSegment2d.from
                     (LineSegment2d.startPoint line)
