@@ -35,14 +35,14 @@ init =
         Knob.compose Controls
             |> Knob.stackLabel "Mirror angle"
                 (Knob.floatSlider
-                    { range = ( -180, 180 )
+                    { range = ( -10, 10 )
                     , step = 0.1
                     , initial = 0
                     }
                 )
             |> Knob.stackLabel "Sight angle"
                 (Knob.floatSlider
-                    { range = ( -180, 180 )
+                    { range = ( -45, 45 )
                     , step = 0.1
                     , initial = 0
                     }
