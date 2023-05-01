@@ -116,6 +116,10 @@ viewScene controls =
         sightDirection =
             Direction2d.degrees controls.sightAngle
 
+        sightLine : List (LineSegment2d Pixels c)
+        sightLine =
+            actualSightLine eye sightDirection mirrorAxis
+
         mirrorAxis : Axis2d Pixels c
         mirrorAxis =
             Axis2d.through
@@ -148,9 +152,47 @@ viewScene controls =
     [ mirror |> viewMirror
     , box |> viewBox
     , reflectedBox |> viewBox
-    , viewSight eye sightDirection
-    , eye |> viewEye
     ]
+        ++ viewSight sightLine
+        ++ [ viewEye eye ]
+
+
+actualSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> List (LineSegment2d Pixels c)
+actualSightLine eye direction mirrorAxis =
+    let
+        sightLine : LineSegment2d Pixels c
+        sightLine =
+            LineSegment2d.fromPointAndVector
+                eye
+                (Vector2d.withLength (Pixels.float 1000) direction)
+    in
+    bounceLine sightLine mirrorAxis
+
+
+bounceLine : LineSegment2d Pixels c -> Axis2d Pixels c -> List (LineSegment2d Pixels c)
+bounceLine line bounceAxis =
+    let
+        intersection : Maybe (Point2d Pixels c)
+        intersection =
+            line
+                |> LineSegment2d.intersectionWithAxis bounceAxis
+    in
+    case intersection of
+        Just point ->
+            let
+                exitAngle =
+                    Angle.degrees 270
+            in
+            [ LineSegment2d.from
+                (LineSegment2d.startPoint line)
+                point
+            , LineSegment2d.fromPointAndVector
+                point
+                (Vector2d.rTheta (Pixels.float 1000) exitAngle)
+            ]
+
+        Nothing ->
+            [ line ]
 
 
 viewMirror : LineSegment2d u c -> Html Msg
@@ -179,13 +221,13 @@ viewEye point =
             ]
 
 
-viewSight : Point2d Pixels c -> Direction2d c -> Html Msg
-viewSight eye direction =
-    LineSegment2d.fromPointAndVector
-        eye
-        (Vector2d.withLength (Pixels.float 1000) direction)
-        |> Svg.lineSegment2d
-            [ SvgAttr.strokeWidth (px 3)
-            , SvgAttr.strokeLinecap StrokeLinecapRound
-            , SvgAttr.stroke (Paint Color.lightBrown)
-            ]
+viewSight : List (LineSegment2d Pixels c) -> List (Html Msg)
+viewSight lines =
+    lines
+        |> List.map
+            (Svg.lineSegment2d
+                [ SvgAttr.strokeWidth (px 3)
+                , SvgAttr.strokeLinecap StrokeLinecapRound
+                , SvgAttr.stroke (Paint Color.lightBrown)
+                ]
+            )
