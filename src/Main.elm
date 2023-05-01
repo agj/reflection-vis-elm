@@ -48,7 +48,12 @@ init =
                     }
                 )
             |> Knob.stackLabel "Depth"
-                (Knob.int { step = 1, initial = 5 })
+                (Knob.intConstrained
+                    { range = ( 0, 10 )
+                    , step = 1
+                    , initial = 5
+                    }
+                )
     }
 
 
