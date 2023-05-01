@@ -16,6 +16,7 @@ import LineSegment2d exposing (LineSegment2d)
 import Maybe.Extra as Maybe
 import Pixels exposing (Pixels)
 import Point2d exposing (Point2d)
+import Quantity
 import Rectangle2d exposing (Rectangle2d)
 import TypedSvg as Svg
 import TypedSvg.Attributes as SvgAttr
@@ -55,7 +56,7 @@ construct { mirrorAngle, sightAngle } =
 
         projectedSightLine : Maybe (LineSegment2d Pixels c)
         projectedSightLine =
-            getProjectedSightLine eye sightDirection mirrorLeftAxis mirrorRightAxis
+            getProjectedSightLine eye sightDirection mirrorLeftAxis mirrorRightAxis reflectedBox
 
         mirrorRightAxis : Axis2d Pixels c
         mirrorRightAxis =
@@ -142,12 +143,16 @@ getActualSightLine eye direction mirrorLeftAxis mirrorRightAxis =
             LineSegment2d.fromPointAndVector
                 eye
                 (Vector2d.withLength (Pixels.float 1000) direction)
+
+        bouncedLine : List (LineSegment2d Pixels c)
+        bouncedLine =
+            bounceLineBetween 10 sightLine mirrorLeftAxis mirrorRightAxis
     in
-    bounceLineBetween 10 sightLine mirrorLeftAxis mirrorRightAxis
+    bouncedLine
 
 
-getProjectedSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Axis2d Pixels c -> Maybe (LineSegment2d Pixels c)
-getProjectedSightLine eye direction mirrorLeftAxis mirrorRightAxis =
+getProjectedSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Axis2d Pixels c -> Rectangle2d Pixels c -> Maybe (LineSegment2d Pixels c)
+getProjectedSightLine eye direction mirrorLeftAxis mirrorRightAxis reflectedBox =
     let
         sightLine : LineSegment2d Pixels c
         sightLine =
@@ -162,10 +167,14 @@ getProjectedSightLine eye direction mirrorLeftAxis mirrorRightAxis =
     in
     intersection
         |> Maybe.map
-            (\line ->
-                LineSegment2d.from
-                    line
-                    (LineSegment2d.endPoint sightLine)
+            (\point ->
+                let
+                    line =
+                        LineSegment2d.from point (LineSegment2d.endPoint sightLine)
+                in
+                line
+                    |> intersectLineWithBox reflectedBox
+                    |> Maybe.withDefault line
             )
 
 
@@ -219,6 +228,43 @@ bounceLine line bounceAxis =
                     (Vector2d.rTheta (Pixels.float 1000) exitAngle)
                 )
             )
+
+
+intersectLineWithBox : Rectangle2d Pixels c -> LineSegment2d Pixels c -> Maybe (LineSegment2d Pixels c)
+intersectLineWithBox box line =
+    let
+        intersectWithSide : LineSegment2d Pixels c -> Maybe (LineSegment2d Pixels c)
+        intersectWithSide side =
+            LineSegment2d.intersectionPoint line side
+                |> Maybe.map
+                    (\intersectionPoint ->
+                        LineSegment2d.from
+                            (LineSegment2d.startPoint line)
+                            intersectionPoint
+                    )
+
+        intersections : List (LineSegment2d Pixels c)
+        intersections =
+            Rectangle2d.edges box
+                |> List.filterMap intersectWithSide
+
+        getShorter : LineSegment2d Pixels c -> LineSegment2d Pixels c -> LineSegment2d Pixels c
+        getShorter lineA lineB =
+            if LineSegment2d.length lineA |> Quantity.lessThan (LineSegment2d.length lineB) then
+                lineA
+
+            else
+                lineB
+
+        result =
+            intersections
+                |> List.foldl getShorter line
+    in
+    if result == line then
+        Nothing
+
+    else
+        Just result
 
 
 viewMirror : LineSegment2d u c -> Html msg
