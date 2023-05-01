@@ -1,0 +1,124 @@
+lockfileVersion: '6.0'
+
+dependencies:
+  '@lydell/elm':
+    specifier: 0.19.1-12
+    version: 0.19.1-12
+  elm-format:
+    specifier: ^0.8.7
+    version: 0.8.7
+
+packages:
+
+  /@avh4/elm-format-darwin-arm64@0.8.7-2:
+    resolution: {integrity: sha512-F5JD44mJ3KX960J5GkXMfh1/dtkXuPcQpX2EToHQKjLTZUfnhZ++ytQQt0gAvrJ0bzoOvhNzjNjUHDA1ruTVbg==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@avh4/elm-format-darwin-x64@0.8.7-2:
+    resolution: {integrity: sha512-4pfF1cl0KyTion+7Mg4XKM3yi4Yc7vP76Kt/DotLVGJOSag4ISGic1og2mt8RZZ7XArybBmHNyYkiUbe/cEiCw==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@avh4/elm-format-linux-arm64@0.8.7-2:
+    resolution: {integrity: sha512-WkVmuce2zU6s9dupHhqPc886Vaqpea8dZlxv2fpZ4wSzPUbiiKHoHZzoVndMIMTUL0TZukP3Ps0n/lWO5R5+FA==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@avh4/elm-format-linux-x64@0.8.7-2:
+    resolution: {integrity: sha512-kmncfJrTBjVT94JtQvMf4M5Pn2Yl0sZt3wo7AzgFiDnB/CiZ+KjJyXuWM64NeGiv4MQqzPq65tsFXUH1CIJeiQ==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@avh4/elm-format-win32-x64@0.8.7-2:
+    resolution: {integrity: sha512-sBdMBGq/8mD8Y5C+fIr5vlb3N50yB7S1MfgeAq2QEbvkr/sKrCZI540i43lZDH9gWsfA1w2W8wCe0penFYzsGw==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@lydell/elm@0.19.1-12:
+    resolution: {integrity: sha512-m8Gu/dJ8GcIoOJVN2QE6Km/uLmeHZIa3/VsfzIsi+jM0jHAb3ybxi9xtJXJTdn2wtMoG/y9f3kXGudJ3xMO4Wg==}
+    hasBin: true
+    requiresBuild: true
+    optionalDependencies:
+      '@lydell/elm_darwin_arm64': 0.19.1-2
+      '@lydell/elm_darwin_x64': 0.19.1-2
+      '@lydell/elm_linux_arm': 0.19.1-0
+      '@lydell/elm_linux_arm64': 0.19.1-4
+      '@lydell/elm_linux_x64': 0.19.1-1
+      '@lydell/elm_win32_x64': 0.19.1-1
+    dev: false
+
+  /@lydell/elm_darwin_arm64@0.19.1-2:
+    resolution: {integrity: sha512-SkOn4Is9P1lTPqrBg2BLOQL5/qOrT0/MZNPPJN0dLMuqY7sl76/5NmzJr2tyENadQXGQrVksy4ITd5UsareNiA==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@lydell/elm_darwin_x64@0.19.1-2:
+    resolution: {integrity: sha512-MXfQwxdQfmuQ22iDCFlcXu5YTA0w6/ASzbxmWc+8DkgUkHTynjViGBVkQljAbYe4ZWgrYGWinZQQyhVnp/5oZw==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@lydell/elm_linux_arm64@0.19.1-4:
+    resolution: {integrity: sha512-JuUkkVBtJjUajtTriQFFANHDmwA14NhqNqgIcq5LCJ6vUQv5/LVd6NUOkl/Rdq7Ju/VN/XwBD1/vm7MGIMOTqA==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@lydell/elm_linux_arm@0.19.1-0:
+    resolution: {integrity: sha512-crKrLzuT6jn4OOS7PWKZGYFw6vHwPu3iNP7lg8rFkOog/HxlkRwX4S695aILBG8SGTLhEdfP9tg28SQ7vR4Lpg==}
+    cpu: [arm]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@lydell/elm_linux_x64@0.19.1-1:
+    resolution: {integrity: sha512-1Y8UAb+GfUqlSjUTX9CaaZhJqvhVcfNbYC0N9AEutlXf1CzFMvF4VsDeZdxzhNI4allPRWBD1IqtdlLhBTFacA==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@lydell/elm_win32_x64@0.19.1-1:
+    resolution: {integrity: sha512-3LMiJ+uUxDFLNnCd6HBmvVWSjSWjs/Z9dMXZWCMOcw3vrW9iOkRrsNGNxohRXun2YRd8wXOX8/DwVn8i2SJ3KA==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /elm-format@0.8.7:
+    resolution: {integrity: sha512-sVzFXfWnb+6rzXK+q3e3Ccgr6/uS5mFbFk1VSmigC+x2XZ28QycAa7lS8owl009ALPhRQk+pZ95Eq5ANjpEZsQ==}
+    hasBin: true
+    requiresBuild: true
+    optionalDependencies:
+      '@avh4/elm-format-darwin-arm64': 0.8.7-2
+      '@avh4/elm-format-darwin-x64': 0.8.7-2
+      '@avh4/elm-format-linux-arm64': 0.8.7-2
+      '@avh4/elm-format-linux-x64': 0.8.7-2
+      '@avh4/elm-format-win32-x64': 0.8.7-2
+    dev: false

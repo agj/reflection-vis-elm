@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "dependencies": {
+    "@lydell/elm": "0.19.1-12",
+    "elm-format": "^0.8.7"
+  }
+}
