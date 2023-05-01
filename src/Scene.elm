@@ -210,9 +210,19 @@ viewEye point =
 
 viewSightLine : Bool -> LineSegment2d Pixels c -> Html msg
 viewSightLine isActual =
-    Svg.lineSegment2d
-        [ SvgAttr.strokeWidth (px 3)
-        , SvgAttr.strokeLinecap StrokeLinecapRound
-        , SvgAttr.stroke (Paint Color.lightBrown)
-        , SvgAttr.strokeDasharray "4 8"
-        ]
+    let
+        baseStyles =
+            [ SvgAttr.strokeWidth (px 3)
+            , SvgAttr.strokeLinecap StrokeLinecapRound
+            , SvgAttr.stroke (Paint Color.lightBrown)
+            ]
+
+        styles =
+            if isActual then
+                baseStyles
+
+            else
+                SvgAttr.strokeDasharray "4 8"
+                    :: baseStyles
+    in
+    Svg.lineSegment2d styles
