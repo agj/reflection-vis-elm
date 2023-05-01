@@ -32,7 +32,7 @@ main =
 init : Model
 init =
     { controls =
-        Knob.compose Controls
+        Knob.compose Scene.Config
             |> Knob.stackLabel "Mirror angle"
                 (Knob.floatSlider
                     { range = ( -10, 10 )
@@ -47,6 +47,8 @@ init =
                     , initial = 0
                     }
                 )
+            |> Knob.stackLabel "Depth"
+                (Knob.int { step = 1, initial = 5 })
     }
 
 
@@ -55,13 +57,7 @@ init =
 
 
 type alias Model =
-    { controls : Knob Controls }
-
-
-type alias Controls =
-    { mirrorAngle : Float
-    , sightAngle : Float
-    }
+    { controls : Knob Scene.Config }
 
 
 
@@ -69,7 +65,7 @@ type alias Controls =
 
 
 type Msg
-    = ControlsKnobUpdated (Knob Controls)
+    = ControlsKnobUpdated (Knob Scene.Config)
 
 
 update : Msg -> Model -> Model

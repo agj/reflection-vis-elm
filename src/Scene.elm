@@ -1,5 +1,7 @@
 module Scene exposing
-    ( construct
+    ( Config
+    , Scene
+    , construct
     , view
     )
 
@@ -35,12 +37,15 @@ type alias Scene =
     }
 
 
-construct :
+type alias Config =
     { mirrorAngle : Float
     , sightAngle : Float
+    , depth : Int
     }
-    -> Scene
-construct { mirrorAngle, sightAngle } =
+
+
+construct : Config -> Scene
+construct { mirrorAngle, sightAngle, depth } =
     let
         eye : Point2d Pixels c
         eye =
