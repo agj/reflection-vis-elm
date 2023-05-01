@@ -8,6 +8,7 @@ import Direction2d
 import Geometry.Svg as Svg
 import Html exposing (Html)
 import Html.Attributes
+import Knob exposing (Knob)
 import LineSegment2d exposing (LineSegment2d)
 import Pixels exposing (Pixels)
 import Point2d
@@ -28,7 +29,16 @@ main =
 
 init : Model
 init =
-    {}
+    { controls =
+        Knob.compose Controls
+            |> Knob.stackLabel "Mirror angle"
+                (Knob.floatSlider
+                    { range = ( -180, 180 )
+                    , step = 0.1
+                    , initial = 0
+                    }
+                )
+    }
 
 
 
@@ -36,7 +46,12 @@ init =
 
 
 type alias Model =
-    {}
+    { controls : Knob Controls }
+
+
+type alias Controls =
+    { mirrorAngle : Float
+    }
 
 
 
@@ -44,12 +59,14 @@ type alias Model =
 
 
 type Msg
-    = NoOp
+    = ControlsKnobUpdated (Knob Controls)
 
 
 update : Msg -> Model -> Model
 update msg model =
-    model
+    case msg of
+        ControlsKnobUpdated knobState ->
+            { model | controls = knobState }
 
 
 
@@ -59,11 +76,16 @@ update msg model =
 view : Model -> Html Msg
 view model =
     let
+        controls =
+            Knob.value model.controls
+
         mirror : LineSegment2d Pixels c
         mirror =
             LineSegment2d.from
                 (Point2d.pixels 0 -100)
                 (Point2d.pixels 0 100)
+                |> LineSegment2d.rotateAround Point2d.origin
+                    (Angle.degrees controls.mirrorAngle)
 
         box : Rectangle2d Pixels c
         box =
@@ -99,6 +121,8 @@ view model =
                 }  
                 """
             ]
+        , Knob.view ControlsKnobUpdated model.controls
+        , Knob.styles
         ]
 
 
