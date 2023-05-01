@@ -26,7 +26,8 @@ type alias Scene =
     { eye : Point2d Pixels Never
     , actualSightLine : List (LineSegment2d Pixels Never)
     , projectedSightLine : Maybe (LineSegment2d Pixels Never)
-    , mirror : LineSegment2d Pixels Never
+    , mirrorRight : LineSegment2d Pixels Never
+    , mirrorLeft : LineSegment2d Pixels Never
     , box : Rectangle2d Pixels Never
     , reflectedBox : Rectangle2d Pixels Never
     }
@@ -49,23 +50,36 @@ construct { mirrorAngle, sightAngle } =
 
         sightLine : List (LineSegment2d Pixels c)
         sightLine =
-            getActualSightLine eye sightDirection mirrorAxis
+            getActualSightLine eye sightDirection mirrorLeftAxis mirrorRightAxis
 
         projectedSightLine : Maybe (LineSegment2d Pixels c)
         projectedSightLine =
-            getProjectedSightLine eye sightDirection mirrorAxis
+            getProjectedSightLine eye sightDirection mirrorLeftAxis mirrorRightAxis
 
-        mirrorAxis : Axis2d Pixels c
-        mirrorAxis =
+        mirrorRightAxis : Axis2d Pixels c
+        mirrorRightAxis =
             Axis2d.through
                 Point2d.origin
                 Direction2d.positiveY
                 |> Axis2d.rotateBy (Angle.degrees mirrorAngle)
 
-        mirror : LineSegment2d Pixels c
-        mirror =
+        mirrorRight : LineSegment2d Pixels c
+        mirrorRight =
             LineSegment2d.along
-                mirrorAxis
+                mirrorRightAxis
+                (Pixels.float -200)
+                (Pixels.float 200)
+
+        mirrorLeftAxis : Axis2d Pixels c
+        mirrorLeftAxis =
+            Axis2d.through
+                (Point2d.pixels -200 0)
+                Direction2d.positiveY
+
+        mirrorLeft : LineSegment2d Pixels c
+        mirrorLeft =
+            LineSegment2d.along
+                mirrorLeftAxis
                 (Pixels.float -200)
                 (Pixels.float 200)
 
@@ -80,14 +94,15 @@ construct { mirrorAngle, sightAngle } =
         reflectedBox =
             box
                 |> Rectangle2d.mirrorAcross
-                    (Axis2d.throughPoints (LineSegment2d.startPoint mirror) (LineSegment2d.endPoint mirror)
+                    (Axis2d.throughPoints (LineSegment2d.startPoint mirrorRight) (LineSegment2d.endPoint mirrorRight)
                         |> Maybe.withDefault Axis2d.x
                     )
     in
     { eye = eye
     , actualSightLine = sightLine
     , projectedSightLine = projectedSightLine
-    , mirror = mirror
+    , mirrorRight = mirrorRight
+    , mirrorLeft = mirrorLeft
     , box = box
     , reflectedBox = reflectedBox
     }
@@ -104,7 +119,8 @@ view scene =
                 Nothing ->
                     []
     in
-    [ viewMirror scene.mirror
+    [ viewMirror scene.mirrorRight
+    , viewMirror scene.mirrorLeft
     , viewBox scene.box
     , viewBox scene.reflectedBox
     ]
@@ -117,8 +133,8 @@ view scene =
 -- INTERNAL
 
 
-getActualSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> List (LineSegment2d Pixels c)
-getActualSightLine eye direction mirrorAxis =
+getActualSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Axis2d Pixels c -> List (LineSegment2d Pixels c)
+getActualSightLine eye direction mirrorLeftAxis mirrorRightAxis =
     let
         sightLine : LineSegment2d Pixels c
         sightLine =
@@ -126,11 +142,11 @@ getActualSightLine eye direction mirrorAxis =
                 eye
                 (Vector2d.withLength (Pixels.float 1000) direction)
     in
-    bounceLine sightLine mirrorAxis
+    bounceLine sightLine mirrorRightAxis
 
 
-getProjectedSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Maybe (LineSegment2d Pixels c)
-getProjectedSightLine eye direction mirrorAxis =
+getProjectedSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Axis2d Pixels c -> Maybe (LineSegment2d Pixels c)
+getProjectedSightLine eye direction mirrorLeftAxis mirrorRightAxis =
     let
         sightLine : LineSegment2d Pixels c
         sightLine =
@@ -141,7 +157,7 @@ getProjectedSightLine eye direction mirrorAxis =
         intersection : Maybe (Point2d Pixels c)
         intersection =
             sightLine
-                |> LineSegment2d.intersectionWithAxis mirrorAxis
+                |> LineSegment2d.intersectionWithAxis mirrorRightAxis
     in
     intersection
         |> Maybe.map
