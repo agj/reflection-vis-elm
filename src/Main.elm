@@ -3,15 +3,16 @@ module Main exposing (main)
 import Angle
 import Axis2d exposing (Axis2d)
 import Browser
+import Circle2d exposing (Circle2d)
 import Color
-import Direction2d
+import Direction2d exposing (Direction2d)
 import Geometry.Svg as Svg
 import Html exposing (Html)
 import Html.Attributes
 import Knob exposing (Knob)
 import LineSegment2d exposing (LineSegment2d)
 import Pixels exposing (Pixels)
-import Point2d
+import Point2d exposing (Point2d)
 import Rectangle2d exposing (Rectangle2d)
 import TypedSvg as Svg
 import TypedSvg.Attributes as SvgAttr
@@ -38,6 +39,13 @@ init =
                     , initial = 0
                     }
                 )
+            |> Knob.stackLabel "Sight angle"
+                (Knob.floatSlider
+                    { range = ( -180, 180 )
+                    , step = 0.1
+                    , initial = 0
+                    }
+                )
     }
 
 
@@ -51,6 +59,7 @@ type alias Model =
 
 type alias Controls =
     { mirrorAngle : Float
+    , sightAngle : Float
     }
 
 
@@ -99,6 +108,14 @@ view model =
 viewScene : Controls -> List (Html Msg)
 viewScene controls =
     let
+        eye : Point2d Pixels c
+        eye =
+            Point2d.pixels -100 -100
+
+        sightDirection : Direction2d c
+        sightDirection =
+            Direction2d.degrees controls.sightAngle
+
         mirrorAxis : Axis2d Pixels c
         mirrorAxis =
             Axis2d.through
@@ -131,6 +148,8 @@ viewScene controls =
     [ mirror |> viewMirror
     , box |> viewBox
     , reflectedBox |> viewBox
+    , viewSight eye sightDirection
+    , eye |> viewEye
     ]
 
 
@@ -149,4 +168,24 @@ viewBox rectangle =
     rectangle
         |> Svg.rectangle2d
             [ SvgAttr.fill (Paint Color.lightPurple)
+            ]
+
+
+viewEye : Point2d Pixels c -> Html Msg
+viewEye point =
+    Circle2d.atPoint point (Pixels.float 10)
+        |> Svg.circle2d
+            [ SvgAttr.fill (Paint Color.lightPurple)
+            ]
+
+
+viewSight : Point2d Pixels c -> Direction2d c -> Html Msg
+viewSight eye direction =
+    LineSegment2d.fromPointAndVector
+        eye
+        (Vector2d.withLength (Pixels.float 1000) direction)
+        |> Svg.lineSegment2d
+            [ SvgAttr.strokeWidth (px 3)
+            , SvgAttr.strokeLinecap StrokeLinecapRound
+            , SvgAttr.stroke (Paint Color.lightBrown)
             ]
