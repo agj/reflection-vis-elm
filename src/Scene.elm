@@ -15,6 +15,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Knob exposing (Knob)
 import LineSegment2d exposing (LineSegment2d)
+import List.Extra as List
 import Maybe.Extra as Maybe
 import Pixels exposing (Pixels)
 import Point2d exposing (Point2d)
@@ -34,7 +35,7 @@ type alias Scene =
     , mirrorLeft : LineSegment2d Pixels Never
     , reflectedMirrors : List (LineSegment2d Pixels Never)
     , box : Rectangle2d Pixels Never
-    , reflectedBox : Rectangle2d Pixels Never
+    , reflectedBoxes : List (Rectangle2d Pixels Never)
     }
 
 
@@ -106,6 +107,15 @@ construct { mirrorAngle, sightAngle, depth } =
         reflectedMirrors =
             reflectedAxes
                 |> List.map axisToMirrorLine
+
+        reflectedBoxes : List (Rectangle2d Pixels c)
+        reflectedBoxes =
+            (mirrorRightAxis :: reflectedAxes)
+                |> List.scanl
+                    (\axis box_ ->
+                        Rectangle2d.mirrorAcross axis box_
+                    )
+                    box
     in
     { eye = eye
     , actualSightLine = sightLine
@@ -114,7 +124,7 @@ construct { mirrorAngle, sightAngle, depth } =
     , mirrorLeft = mirrorLeft
     , reflectedMirrors = reflectedMirrors
     , box = box
-    , reflectedBox = reflectedBox
+    , reflectedBoxes = reflectedBoxes
     }
 
 
@@ -133,9 +143,8 @@ view scene =
     , viewMirror scene.mirrorLeft
     ]
         ++ (scene.reflectedMirrors |> List.map viewMirror)
-        ++ [ viewBox scene.box
-           , viewBox scene.reflectedBox
-           ]
+        ++ [ viewBox scene.box ]
+        ++ (scene.reflectedBoxes |> List.map viewBox)
         ++ projectedSightLine
         ++ (scene.actualSightLine |> List.map (viewSightLine True))
         ++ [ viewEye scene.eye ]
