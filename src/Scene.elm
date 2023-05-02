@@ -71,10 +71,7 @@ construct { mirrorAngle, sightAngle, depth } =
 
         mirrorRight : LineSegment2d Pixels c
         mirrorRight =
-            LineSegment2d.along
-                mirrorRightAxis
-                (Pixels.float -200)
-                (Pixels.float 200)
+            axisToMirrorLine mirrorRightAxis
 
         mirrorLeftAxis : Axis2d Pixels c
         mirrorLeftAxis =
@@ -84,10 +81,7 @@ construct { mirrorAngle, sightAngle, depth } =
 
         mirrorLeft : LineSegment2d Pixels c
         mirrorLeft =
-            LineSegment2d.along
-                mirrorLeftAxis
-                (Pixels.float -200)
-                (Pixels.float 200)
+            axisToMirrorLine mirrorLeftAxis
 
         box : Rectangle2d Pixels c
         box =
@@ -104,17 +98,21 @@ construct { mirrorAngle, sightAngle, depth } =
                         |> Maybe.withDefault Axis2d.x
                     )
 
-        reflectedMirror : LineSegment2d Pixels c
-        reflectedMirror =
-            mirrorLeft
-                |> LineSegment2d.mirrorAcross mirrorRightAxis
+        reflectedAxes : List (Axis2d Pixels c)
+        reflectedAxes =
+            reflectAxes depth mirrorRightAxis mirrorLeftAxis
+
+        reflectedMirrors : List (LineSegment2d Pixels c)
+        reflectedMirrors =
+            reflectedAxes
+                |> List.map axisToMirrorLine
     in
     { eye = eye
     , actualSightLine = sightLine
     , projectedSightLine = projectedSightLine
     , mirrorRight = mirrorRight
     , mirrorLeft = mirrorLeft
-    , reflectedMirrors = [ reflectedMirror ]
+    , reflectedMirrors = reflectedMirrors
     , box = box
     , reflectedBox = reflectedBox
     }
@@ -145,6 +143,13 @@ view scene =
 
 
 -- INTERNAL
+
+
+axisToMirrorLine : Axis2d Pixels c -> LineSegment2d Pixels c
+axisToMirrorLine axis =
+    LineSegment2d.along axis
+        (Pixels.float -200)
+        (Pixels.float 200)
 
 
 getActualSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Axis2d Pixels c -> Rectangle2d Pixels c -> List (LineSegment2d Pixels c)
@@ -291,6 +296,20 @@ intersectLineWithBox box line =
 
     else
         Just result
+
+
+reflectAxes : Int -> Axis2d u c -> Axis2d u c -> List (Axis2d u c)
+reflectAxes depth baseAxis axisToReflect =
+    if depth == 0 then
+        [ baseAxis ]
+
+    else
+        let
+            reflected =
+                axisToReflect
+                    |> Axis2d.mirrorAcross baseAxis
+        in
+        reflected :: reflectAxes (depth - 1) reflected baseAxis
 
 
 viewMirror : LineSegment2d u c -> Html msg
