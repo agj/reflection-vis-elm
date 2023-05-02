@@ -25,16 +25,17 @@ import TypedSvg.Types exposing (Paint(..), StrokeLinecap(..), Transform(..), px)
 import Vector2d
 
 
-type alias Scene =
-    { eye : Point2d Pixels Never
-    , actualSightLine : List (LineSegment2d Pixels Never)
-    , projectedSightLine : Maybe (LineSegment2d Pixels Never)
-    , mirrorRight : LineSegment2d Pixels Never
-    , mirrorLeft : LineSegment2d Pixels Never
-    , reflectedMirrors : List (LineSegment2d Pixels Never)
-    , box : Rectangle2d Pixels Never
-    , reflectedBoxes : List (Rectangle2d Pixels Never)
-    }
+type Scene
+    = Scene
+        { eye : Point2d Pixels Never
+        , actualSightLine : List (LineSegment2d Pixels Never)
+        , projectedSightLine : Maybe (LineSegment2d Pixels Never)
+        , mirrorRight : LineSegment2d Pixels Never
+        , mirrorLeft : LineSegment2d Pixels Never
+        , reflectedMirrors : List (LineSegment2d Pixels Never)
+        , box : Rectangle2d Pixels Never
+        , reflectedBoxes : List (Rectangle2d Pixels Never)
+        }
 
 
 type alias Config =
@@ -107,19 +108,20 @@ construct { mirrorAngle, sightAngle, depth } =
                     )
                     box
     in
-    { eye = eye
-    , actualSightLine = sightLine
-    , projectedSightLine = projectedSightLine
-    , mirrorRight = mirrorRight
-    , mirrorLeft = mirrorLeft
-    , reflectedMirrors = reflectedMirrors
-    , box = box
-    , reflectedBoxes = reflectedBoxes
-    }
+    Scene
+        { eye = eye
+        , actualSightLine = sightLine
+        , projectedSightLine = projectedSightLine
+        , mirrorRight = mirrorRight
+        , mirrorLeft = mirrorLeft
+        , reflectedMirrors = reflectedMirrors
+        , box = box
+        , reflectedBoxes = reflectedBoxes
+        }
 
 
 view : Scene -> List (Html msg)
-view scene =
+view (Scene scene) =
     let
         projectedSightLine =
             case scene.projectedSightLine of
