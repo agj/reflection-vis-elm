@@ -2,6 +2,8 @@
 
 An small Elm app that visualizes a “hall of mirrors” effect, mapping the line of sight both as it bounces between the mirrors and as it is intuitively projected into the space “inside” the mirror.
 
+[You can try it here.](https://agj.github.io/reflection-vis-elm/)
+
 ## Running locally
 
 You'll need [Node](https://nodejs.org/) ~v19 and [pnpm](https://pnpm.io/) ~v8, as well as a Posix shell to run the commands.
