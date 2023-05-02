@@ -301,7 +301,7 @@ intersectLineWithBox box line =
 reflectAxes : Int -> Axis2d u c -> Axis2d u c -> List (Axis2d u c)
 reflectAxes depth baseAxis axisToReflect =
     if depth == 0 then
-        [ baseAxis ]
+        []
 
     else
         let
