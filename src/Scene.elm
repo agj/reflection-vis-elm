@@ -12,8 +12,6 @@ import Color
 import Direction2d exposing (Direction2d)
 import Geometry.Svg as Svg
 import Html exposing (Html)
-import Html.Attributes
-import Knob exposing (Knob)
 import LineSegment2d exposing (LineSegment2d)
 import List.Extra as List
 import Maybe.Extra as Maybe
@@ -23,7 +21,7 @@ import Quantity
 import Rectangle2d exposing (Rectangle2d)
 import TypedSvg as Svg
 import TypedSvg.Attributes as SvgAttr
-import TypedSvg.Types exposing (Paint(..), StrokeLinecap(..), Transform(..), pc, px)
+import TypedSvg.Types exposing (Paint(..), StrokeLinecap(..), Transform(..), px)
 import Vector2d
 
 

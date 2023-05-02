@@ -1,24 +1,13 @@
 module Main exposing (main)
 
-import Angle
-import Axis2d exposing (Axis2d)
 import Browser
-import Circle2d exposing (Circle2d)
-import Color
-import Direction2d exposing (Direction2d)
 import Geometry.Svg as Svg
 import Html exposing (Html)
 import Html.Attributes
 import Knob exposing (Knob)
-import LineSegment2d exposing (LineSegment2d)
-import Pixels exposing (Pixels)
-import Point2d exposing (Point2d)
-import Rectangle2d exposing (Rectangle2d)
 import Scene
 import TypedSvg as Svg
 import TypedSvg.Attributes as SvgAttr
-import TypedSvg.Types exposing (Paint(..), StrokeLinecap(..), Transform(..), pc, px)
-import Vector2d
 
 
 main =
