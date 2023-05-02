@@ -4,10 +4,12 @@ An small Elm app that visualizes a “hall of mirrors” effect, mapping the lin
 
 ## Running locally
 
-You'll need [Node](https://nodejs.org/) ~v19 and [pnpm](https://pnpm.io/) ~v8, as well as a Posix environment.
+You'll need [Node](https://nodejs.org/) ~v19 and [pnpm](https://pnpm.io/) ~v8, as well as a Posix shell to run the commands.
+npm should also work instead of pnpm, but it is untested.
 
-Run the following command to start a server to view in your browser:
+Run the following commands to install dependencies and start a server to view in your browser:
 
 ```sh
+pnpm install
 make start
 ```
