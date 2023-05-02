@@ -63,7 +63,7 @@ construct { mirrorAngle, sightAngle, depth } =
 
         projectedSightLine : Maybe (LineSegment2d Pixels c)
         projectedSightLine =
-            getProjectedSightLine eye sightDirection mirrorLeftAxis mirrorRightAxis reflectedBox
+            getProjectedSightLine eye sightDirection mirrorRightAxis reflectedBoxes
 
         mirrorRightAxis : Axis2d Pixels c
         mirrorRightAxis =
@@ -90,14 +90,6 @@ construct { mirrorAngle, sightAngle, depth } =
                 ( Pixels.float 50, Pixels.float 50 )
                 (Angle.degrees 20)
                 (Point2d.pixels -100 0)
-
-        reflectedBox : Rectangle2d Pixels c
-        reflectedBox =
-            box
-                |> Rectangle2d.mirrorAcross
-                    (Axis2d.throughPoints (LineSegment2d.startPoint mirrorRight) (LineSegment2d.endPoint mirrorRight)
-                        |> Maybe.withDefault Axis2d.x
-                    )
 
         reflectedAxes : List (Axis2d Pixels c)
         reflectedAxes =
@@ -191,8 +183,8 @@ getActualSightLine eye direction mirrorLeftAxis mirrorRightAxis box =
     intersectedBouncedLine
 
 
-getProjectedSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> Axis2d Pixels c -> Rectangle2d Pixels c -> Maybe (LineSegment2d Pixels c)
-getProjectedSightLine eye direction mirrorLeftAxis mirrorRightAxis reflectedBox =
+getProjectedSightLine : Point2d Pixels c -> Direction2d c -> Axis2d Pixels c -> List (Rectangle2d Pixels c) -> Maybe (LineSegment2d Pixels c)
+getProjectedSightLine eye direction mirrorRightAxis reflectedBoxes =
     let
         sightLine : LineSegment2d Pixels c
         sightLine =
@@ -211,10 +203,13 @@ getProjectedSightLine eye direction mirrorLeftAxis mirrorRightAxis reflectedBox 
                 let
                     line =
                         LineSegment2d.from point (LineSegment2d.endPoint sightLine)
+
+                    boxIntersections =
+                        reflectedBoxes
+                            |> List.filterMap (\box -> intersectLineWithBox box line)
                 in
-                line
-                    |> intersectLineWithBox reflectedBox
-                    |> Maybe.withDefault line
+                boxIntersections
+                    |> List.foldl getShorterLine line
             )
 
 
@@ -288,23 +283,24 @@ intersectLineWithBox box line =
             Rectangle2d.edges box
                 |> List.filterMap intersectWithSide
 
-        getShorter : LineSegment2d Pixels c -> LineSegment2d Pixels c -> LineSegment2d Pixels c
-        getShorter lineA lineB =
-            if LineSegment2d.length lineA |> Quantity.lessThan (LineSegment2d.length lineB) then
-                lineA
-
-            else
-                lineB
-
         result =
             intersections
-                |> List.foldl getShorter line
+                |> List.foldl getShorterLine line
     in
     if result == line then
         Nothing
 
     else
         Just result
+
+
+getShorterLine : LineSegment2d Pixels c -> LineSegment2d Pixels c -> LineSegment2d Pixels c
+getShorterLine lineA lineB =
+    if LineSegment2d.length lineA |> Quantity.lessThan (LineSegment2d.length lineB) then
+        lineA
+
+    else
+        lineB
 
 
 reflectAxes : Int -> Axis2d u c -> Axis2d u c -> List (Axis2d u c)
