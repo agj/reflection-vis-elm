@@ -4,6 +4,9 @@ start: ## Run the visualization to view in your web browser.
 build: ## Build the output files.
 	pnpm exec parcel build
 
+deploy: ## Deploy to Github Pages.
+	pnpm exec gh-pages -d dist
+
 
 
 # The following makes this file self-documenting.
