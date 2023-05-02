@@ -1,7 +1,11 @@
 {
   "private": true,
+  "source": "index.html",
+  "browserslist": "> 0.5%, last 2 versions, not dead",
   "dependencies": {
     "@lydell/elm": "0.19.1-12",
-    "elm-format": "^0.8.7"
+    "@parcel/transformer-elm": "^2.8.3",
+    "elm-format": "^0.8.7",
+    "parcel": "^2.8.3"
   }
 }

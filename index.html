@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Visualizing reflection</title>
+    <style>
+      html,
+      body,
+      .container,
+      svg {
+        height: 100%;
+        width: 100%;
+      }
+      body {
+        font-family: sans-serif;
+        font-size: 13pt;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="elm"></div>
+    <script type="module">
+      import { Elm } from "./src/Main.elm";
+      Elm.Main.init({ node: document.getElementById("elm") });
+    </script>
+  </body>
+</html>

@@ -91,19 +91,6 @@ view model =
             (Scene.construct (Knob.value model.controls)
                 |> Scene.view
             )
-        , Html.node "style"
-            []
-            [ Html.text
-                """
-                html,
-                body,
-                .container,
-                svg {
-                    height: 100%;
-                    width: 100%;
-                }  
-                """
-            ]
         , Knob.view ControlsKnobUpdated model.controls
         , Knob.styles
         ]
